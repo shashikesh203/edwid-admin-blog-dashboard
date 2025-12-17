@@ -6,9 +6,10 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
+    console.log("Sidebar rendered", isOpen)
     return (
         <>
-            {isOpen && <div className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden" onClick={onClose} />}
+            {isOpen && <div className="fixed inset-0 z-40 lg:hidden" onClick={onClose} />}
             <aside
                 className={`w-64 bg-gray-900 text-white fixed left-0 top-0 bottom-0 flex flex-col z-50 transition-transform duration-300 lg:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full"
                     }`}
@@ -20,6 +21,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                     <NavLink
                         to="/"
                         style={({ isActive }) => ({ backgroundColor: isActive ? "#4B5563" : "transparent", })}
+                        onClick={isOpen ? onClose : undefined}
                         className="flex items-center gap-3 px-4 py-3  text-white rounded-lg hover:bg-gray-700 transition-colors"
                     >
                         <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -35,6 +37,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                     <NavLink
                         to="/categories"
                         style={({ isActive }) => ({ backgroundColor: isActive ? "#4B5563" : "transparent", })}
+                        onClick={isOpen ? onClose : undefined}
                         className="flex items-center gap-3 px-4 py-3  text-white rounded-lg hover:bg-gray-700 transition-colors"
                     >
                         <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

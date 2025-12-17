@@ -2,6 +2,7 @@ import { useState } from "react"
 import Sidebar from "./components/Sidebar"
 import Navbar from "./components/Navbar"
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Blogs from "./pages/Blogs";
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
@@ -12,7 +13,7 @@ function App() {
         <div className="flex-1 lg:ml-64 w-full">
           <Navbar onMenuToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
           <Routes>
-            <Route path="/" element={<>Home page</>} />
+            <Route path="/" element={<Blogs />} />
             <Route path="/categories" element={<>Categories page</>} />
             <Route path="*" element={<>Not Found</>} />
           </Routes>
