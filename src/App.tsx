@@ -14,7 +14,7 @@ function App() {
           <Navbar onMenuToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
           <Routes>
             <Route path="/" element={<Blogs />} />
-            <Route path="/categories" element={<>Categories page</>} />
+            <Route path="/categories" element={<div className=" px-4 sm:px-6 lg:px-8 py-6">Categories page</div>} />
             <Route path="*" element={<>Not Found</>} />
           </Routes>
         </div>

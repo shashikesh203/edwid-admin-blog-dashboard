@@ -6,7 +6,6 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
-    console.log("Sidebar rendered", isOpen)
     return (
         <>
             {isOpen && <div className="fixed inset-0 z-40 lg:hidden" onClick={onClose} />}
