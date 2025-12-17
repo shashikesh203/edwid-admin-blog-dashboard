@@ -2,7 +2,7 @@
 function App() {
 
   return (
-    <>Hello from vite app</>
+    <div className="text-2xl font-bold text-red-900">Hello from vite app</div>
   )
 }
 
