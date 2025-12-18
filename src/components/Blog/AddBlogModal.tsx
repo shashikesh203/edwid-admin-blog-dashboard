@@ -222,7 +222,7 @@ export default function AddBlogModal({ handleBlogDetails, isOpen, onClose }: Add
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative bg-white w-full max-w-2xl mx-4 rounded-lg shadow-lg">
+      <div className="relative bg-white w-full max-w-2xl mx-4 rounded-lg shadow-lg max-h-[90vh] overflow-y-auto">
         <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
           <h3 className="text-lg font-semibold">Add New Blog</h3>
           <button
