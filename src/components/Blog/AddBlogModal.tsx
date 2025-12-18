@@ -5,11 +5,13 @@ import TextAreaBox from "../GenericInput/TextAreaBox";
 import SelectOptions from "../GenericInput/SelectOptions";
 import Category from "../../utils/enums/categoryEnum";
 import BlogStatus from "../../utils/enums/statusEnum";
+import type { BlogPost } from "../../pages/Blogs";
 
 
 interface AddBlogModalProps {
   isOpen: boolean;
   onClose: () => void;
+  handleBlogDetails?: (data: BlogPost) => void;
 };
 
 interface BlogFormData {
@@ -20,6 +22,7 @@ interface BlogFormData {
   publishedDate: string;
   status: string;
   imageUrl?: string;
+
 }
 
 interface ErrorMessages {
@@ -32,7 +35,7 @@ interface ErrorMessages {
   image?: string;
 }
 
-export default function AddBlogModal({ isOpen, onClose }: AddBlogModalProps) {
+export default function AddBlogModal({ handleBlogDetails, isOpen, onClose }: AddBlogModalProps) {
   const [form, setForm] = useState<BlogFormData>({
     title: "",
     description: "",
@@ -41,7 +44,6 @@ export default function AddBlogModal({ isOpen, onClose }: AddBlogModalProps) {
     publishedDate: "",
     status: "",
   });
-  const [disableSubmit, setDisableSubmit] = useState<boolean>(true);
   const [image, setImage] = useState<File | null>(null);
   const [errorsMessage, setErrorsMessage] = useState<ErrorMessages>({});
 
@@ -182,6 +184,13 @@ export default function AddBlogModal({ isOpen, onClose }: AddBlogModalProps) {
     if (Object.keys(validationErrors).length > 0) {
       return;
     }
+    const blogData = {
+      ...form,
+      id: Date.now(),
+      imageUrl: image ? URL.createObjectURL(image) : undefined,
+    };
+
+    handleBlogDetails?.(blogData);
     onClose();
     setForm({
       title: "",

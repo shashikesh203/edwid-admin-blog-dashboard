@@ -1,10 +1,51 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Blog from "../components/Blog/Blog";
 import SearchBox from "../components/GenericInput/SearchBox";
 import AddBlogModal from "../components/Blog/AddBlogModal";
 
+export interface BlogPost {
+  id: number  ;
+  title: string;
+  description: string;
+  category: string;
+  author: string;
+  publishedDate: string;
+  status: string;
+  imageUrl?: string;
+}
+
+
 export default function Blogs() {
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+
+  const handleBlogDetails = (data: BlogPost) => {
+    const newBlog: BlogPost = {
+      ...data,
+      id: Date.now(),
+      imageUrl: data.imageUrl
+    };
+
+    const updatedBlogs = [...blogPosts, newBlog];
+    setBlogPosts(updatedBlogs);
+    localStorage.setItem("blogDetails", JSON.stringify(updatedBlogs));
+  }
+
+  useEffect(() => {
+    const blogPostsData = localStorage.getItem("blogDetails");
+
+    if (blogPostsData) {
+      const parsedPosts: BlogPost[] = JSON.parse(blogPostsData);
+
+      const postsWithImages = parsedPosts.map((post) => ({
+        ...post,
+        imageUrl:
+          post.imageUrl
+      }));
+
+      setBlogPosts(postsWithImages);
+    }
+  }, []);
 
   return (
     <div>
@@ -23,10 +64,10 @@ export default function Blogs() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 px-4 sm:px-6 lg:px-8">
-        <Blog />
+        <Blog blogPosts={blogPosts} />
       </div>
 
-      <AddBlogModal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} />
+      <AddBlogModal handleBlogDetails={handleBlogDetails} isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} />
     </div>
   );
 }

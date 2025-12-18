@@ -1,7 +1,7 @@
 export default function SearchBox() {
     return (
         <div className="flex items-center gap-2 sm:gap-4 flex-1 justify-end py-4">
-            <div className="relative max-w-md flex-1 hidden sm:block">
+            <div className="relative max-w-md flex-1  sm:block">
                 <input
                     type="text"
                     placeholder="Search posts..."
