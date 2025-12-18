@@ -1,7 +1,7 @@
 export default function SearchBox({ searchBlogPosts }: { searchBlogPosts: (query: string) => void }) {
     return (
-        <div className="flex items-center gap-2 sm:gap-4 flex-1 justify-end py-4">
-            <div className="relative max-w-md flex-1  sm:block">
+        <div className="flex items-center gap-2 sm:gap-4 flex-1 justify-end md:py-4 w-full">
+            <div className="relative  w-full md:max-w-md flex-1  sm:block">
                 <input
                     type="text"
                     onChange={(e) => searchBlogPosts(e.target.value)}
