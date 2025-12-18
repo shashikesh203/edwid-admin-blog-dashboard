@@ -1,7 +1,7 @@
 import { useState } from "react";
-import Blog from "../components/Blog";
+import Blog from "../components/Blog/Blog";
 import SearchBox from "../components/GenericInput/SearchBox";
-import AddBlogModal from "../components/AddBlogModal";
+import AddBlogModal from "../components/Blog/AddBlogModal";
 
 export default function Blogs() {
   const [isAddOpen, setIsAddOpen] = useState(false);

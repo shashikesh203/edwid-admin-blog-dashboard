@@ -1,30 +1,30 @@
 import React from "react";
 
-export type Option = { label: string; value: string };
-
-type InputBoxProps = {
+type TextAreaBoxProps = {
     label?: string;
     name: string;
     value: string;
-    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
+    onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
     placeholder?: string;
-    type?: React.InputHTMLAttributes<HTMLInputElement>["type"];
     required?: boolean;
+    rows?: number;
     className?: string;
 };
 
-export default function InputBox({
+export default function TextAreaBox({
     label,
     name,
     value,
     onChange,
     placeholder,
     required,
-    type = "text",
+    rows = 2,
     className = "",
-}: InputBoxProps) {
+}: TextAreaBoxProps) {
     const baseClasses =
-        "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent";
+        "w-full px-4 py-2 border border-gray-300 rounded-lg resize-none " +
+        "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent";
+
     return (
         <div className={`flex flex-col gap-1 ${className}`}>
             {label && (
@@ -32,13 +32,14 @@ export default function InputBox({
                     {label} {required && <span className="text-red-500">*</span>}
                 </label>
             )}
-            <input
+
+            <textarea
                 id={name}
                 name={name}
                 value={value}
                 onChange={onChange}
                 placeholder={placeholder}
-                type={type}
+                rows={rows}
                 className={baseClasses}
             />
         </div>

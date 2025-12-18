@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 type ImageInputProps = {
   label?: string;
@@ -36,45 +36,34 @@ export default function ImageInput({
   };
 
   return (
-    <div className={`flex flex-col gap-2 ${className}`}>
-      {label && (
-        <label htmlFor={name} className="text-sm font-medium text-gray-700">
-          {label} {required && <span className="text-red-500">*</span>}
-        </label>
-      )}
-      <div className="flex items-start gap-4">
-        <label className="flex items-center justify-center px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 cursor-pointer">
-          <input
-            id={name}
-            name={name}
-            type="file"
-            accept={accept}
-            onChange={handleFile}
-            className="hidden"
-          />
-          <span className="text-sm text-gray-700">Choose Image</span>
-        </label>
+    <div className={`flex flex-col items-center gap-3 ${className}`}>
+
+      <div className="w-full h-32 md:h-52  border-1 border-gray-300 overflow-hidden bg-gray-100 flex items-center justify-center ">
         {objectUrl ? (
           <img
             src={objectUrl}
-            alt="Preview"
-            className="w-24 h-24 object-cover rounded-md border border-gray-200"
+            alt="Image Preview"
+            className="w-full h-full"
           />
         ) : (
-          <div className="w-24 h-24 flex items-center justify-center text-gray-400 border border-dashed border-gray-300 rounded-md text-xs">
-            No image
-          </div>
-        )}
-        {value && (
-          <button
-            type="button"
-            onClick={() => onChange(null)}
-            className="px-3 py-2 text-sm text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200"
-          >
-            Remove
-          </button>
+          <span className="text-gray-400 text-sm">No Image</span>
         )}
       </div>
+
+      {/* Upload Button */}
+      <label className="px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 cursor-pointer text-sm text-gray-700">
+        <input
+          id={name}
+          name={name}
+          type="file"
+          accept={accept}
+          onChange={handleFile}
+          className="hidden"
+        />
+        Upload Image {label && (
+          <span className="text-sm font-medium text-gray-700">{required && <span className="text-red-500">*</span>}</span>
+        )}
+      </label>
     </div>
   );
 }
