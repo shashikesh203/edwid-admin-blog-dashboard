@@ -1,6 +1,6 @@
 const BlogStatus = {
-    Draft: "draft",
-    Published: "published",
+    Draft: "Draft",
+    Published: "Published",
 } as const;
 
 export type BlogStatus = typeof BlogStatus[keyof typeof BlogStatus];
