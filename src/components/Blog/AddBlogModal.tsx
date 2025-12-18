@@ -124,13 +124,7 @@ export default function AddBlogModal({ handleBlogDetails, isOpen, onClose }: Add
           setErrorsMessage((prev) => ({ ...prev, image: "" }));
         }
         break;
-      case "category":
-        if (!value.trim()) {
-          setErrorsMessage((prev) => ({ ...prev, category: "Category is required" }));
-        } else {
-          setErrorsMessage((prev) => ({ ...prev, category: "" }));
-        }
-        break;
+  
       default:
         break;
     }
