@@ -5,3 +5,5 @@
 3. Run command "npm i" to install dependency
 
 4. Run command "npm run dev" to start server
+
+5. No env is needed as of now
