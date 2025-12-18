@@ -33,7 +33,7 @@ export default function SelectOptions({
       {label && (
         <label
           htmlFor={name}
-          className="text-sm font-medium text-gray-700 flex items-center gap-1"
+          className="text-sm font-medium text-gray-700 flex items-center gap-1 "
         >
           {label}
           {required && <span className="text-red-500">*</span>}
@@ -54,7 +54,7 @@ export default function SelectOptions({
             border-gray-300
             focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
             transition
-            disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed
+            disabled:bg-gray-100  cursor-pointer
           `}
         >
           {placeholder && (
