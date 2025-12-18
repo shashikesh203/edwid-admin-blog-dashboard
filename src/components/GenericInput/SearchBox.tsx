@@ -1,9 +1,10 @@
-export default function SearchBox() {
+export default function SearchBox({ searchBlogPosts }: { searchBlogPosts: (query: string) => void }) {
     return (
         <div className="flex items-center gap-2 sm:gap-4 flex-1 justify-end py-4">
             <div className="relative max-w-md flex-1  sm:block">
                 <input
                     type="text"
+                    onChange={(e) => searchBlogPosts(e.target.value)}
                     placeholder="Search posts..."
                     className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />

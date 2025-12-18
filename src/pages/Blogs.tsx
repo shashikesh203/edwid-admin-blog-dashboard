@@ -4,7 +4,7 @@ import SearchBox from "../components/GenericInput/SearchBox";
 import AddBlogModal from "../components/Blog/AddBlogModal";
 
 export interface BlogPost {
-  id: number  ;
+  id: number;
   title: string;
   description: string;
   category: string;
@@ -18,39 +18,51 @@ export interface BlogPost {
 export default function Blogs() {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [allBlogPosts, setAllBlogPosts] = useState<BlogPost[]>([]);
 
   const handleBlogDetails = (data: BlogPost) => {
     const newBlog: BlogPost = {
       ...data,
       id: Date.now(),
-      imageUrl: data.imageUrl
+      imageUrl: data.imageUrl,
     };
 
-    const updatedBlogs = [...blogPosts, newBlog];
+    const updatedBlogs = [...allBlogPosts, newBlog];
+
+    setAllBlogPosts(updatedBlogs);
     setBlogPosts(updatedBlogs);
     localStorage.setItem("blogDetails", JSON.stringify(updatedBlogs));
-  }
+  };
+
+  const searchBlogPosts = (query: string) => {
+    if (!query.trim()) {
+      setBlogPosts(allBlogPosts);
+      return;
+    }
+
+    const filteredPosts = allBlogPosts.filter((post) =>
+      post.title.toLowerCase().includes(query.toLowerCase())
+    );
+
+    setBlogPosts(filteredPosts);
+  };
+
 
   useEffect(() => {
     const blogPostsData = localStorage.getItem("blogDetails");
 
     if (blogPostsData) {
       const parsedPosts: BlogPost[] = JSON.parse(blogPostsData);
-
-      const postsWithImages = parsedPosts.map((post) => ({
-        ...post,
-        imageUrl:
-          post.imageUrl
-      }));
-
-      setBlogPosts(postsWithImages);
+      setAllBlogPosts(parsedPosts);
+      setBlogPosts(parsedPosts);
     }
   }, []);
+
 
   return (
     <div>
       <div className="flex flex-col sm:flex-row items-center sm:items-center gap-4 sm:gap-6 justify-between px-4 sm:px-6 lg:px-8 py-6 ">
-        <SearchBox />
+        <SearchBox searchBlogPosts={searchBlogPosts} />
         <button
           onClick={() => setIsAddOpen(true)}
           className="flex items-center gap-2 px-3 sm:px-6 py-2.5 bg-blue-900 text-white rounded-lg hover:bg-blue-800 transition-colors font-medium shadow-sm hover:shadow-md hover:cursor-pointer flex-shrink-0"
