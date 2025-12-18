@@ -117,13 +117,7 @@ export default function AddBlogModal({ handleBlogDetails, isOpen, onClose }: Add
           setErrorsMessage((prev) => ({ ...prev, category: "" }));
         }
         break;
-      case "image":
-        if (!image) {
-          setErrorsMessage((prev) => ({ ...prev, image: "Image is required" }));
-        } else {
-          setErrorsMessage((prev) => ({ ...prev, image: "" }));
-        }
-        break;
+    
   
       default:
         break;
