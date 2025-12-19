@@ -192,6 +192,7 @@ export default function AddBlogModal({ handleBlogDetails, isOpen, onClose }: Add
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setErrorsMessage({});
     setForm({
       title: "",
@@ -241,6 +242,7 @@ export default function AddBlogModal({ handleBlogDetails, isOpen, onClose }: Add
                 }
 
                 if (file.size > 1024 * 1024) {
+                  setImage(null);
                   setErrorsMessage((prev) => ({
                     ...prev,
                     image: "Image must be less than 1 MB",
