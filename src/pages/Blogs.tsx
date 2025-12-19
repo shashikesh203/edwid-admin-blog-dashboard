@@ -22,11 +22,9 @@ export default function Blogs() {
   const [allBlogPosts, setAllBlogPosts] = useState<BlogPost[]>([]);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
 
-  // Filters (default category = All)
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState(""); // "" means All Categories
+  const [selectedCategory, setSelectedCategory] = useState("");
 
-  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const PAGE_SIZE = 5;
@@ -74,18 +72,13 @@ export default function Blogs() {
   const handleBlogDetails = (data: BlogPost) => {
     const newBlog: BlogPost = { ...data, id: Date.now(), imageUrl: data.imageUrl, isDeleted: false };
 
-    // Insert new at the beginning so newest stays first
     const updated: BlogPost[] = [newBlog, ...allBlogPosts];
-
-    // If more than 12 items, remove the last element
     if (updated.length > MAX_ITEMS) {
       updated.pop();
     }
 
     setAllBlogPosts(updated);
     localStorage.setItem("blogDetails", JSON.stringify(updated));
-
-    // Reset to default filters (All category, empty search) and first page
     setSearchQuery("");
     setSelectedCategory("");
     refreshList(updated, "", "", 1);
@@ -97,7 +90,7 @@ export default function Blogs() {
   };
 
   const onCategoryChange: React.ChangeEventHandler<HTMLSelectElement> = (e) => {
-    const value = e.target.value; // "" => All Categories
+    const value = e.target.value;
     setSelectedCategory(value);
     refreshList(null, undefined, value, 1);
   };
@@ -106,7 +99,6 @@ export default function Blogs() {
     const updated = allBlogPosts.map((post) => (post.id === id ? { ...post, isDeleted: true } : post));
     setAllBlogPosts(updated);
     localStorage.setItem("blogDetails", JSON.stringify(updated));
-    // keep current filters but ensure pagination still valid
     refreshList(updated);
   };
 
@@ -116,7 +108,6 @@ export default function Blogs() {
       const parsed: BlogPost[] = JSON.parse(data);
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setAllBlogPosts(parsed);
-      // Default: All Categories + empty search, start at page 1
       refreshList(parsed, "", "", 1);
     }
   }, []);
@@ -164,11 +155,10 @@ export default function Blogs() {
             aria-label="Previous page"
             onClick={() => refreshList(null, undefined, undefined, currentPage - 1)}
             disabled={currentPage <= 1}
-            className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-semibold transition-all ${
-              currentPage <= 1
+            className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-semibold transition-all ${currentPage <= 1
                 ? "bg-gray-200 text-gray-400 cursor-not-allowed"
                 : "bg-blue-900 text-white hover:bg-blue-800 active:scale-95"
-            }`}
+              }`}
           >
             ‹
           </button>
@@ -183,11 +173,10 @@ export default function Blogs() {
             aria-label="Next page"
             onClick={() => refreshList(null, undefined, undefined, currentPage + 1)}
             disabled={currentPage >= totalPages}
-            className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-semibold transition-all ${
-              currentPage >= totalPages
+            className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-semibold transition-all ${currentPage >= totalPages
                 ? "bg-gray-200 text-gray-400 cursor-not-allowed"
                 : "bg-blue-900 text-white hover:bg-blue-800 active:scale-95"
-            }`}
+              }`}
           >
             ›
           </button>
