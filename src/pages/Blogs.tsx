@@ -114,6 +114,7 @@ export default function Blogs() {
     const data = localStorage.getItem("blogDetails");
     if (data) {
       const parsed: BlogPost[] = JSON.parse(data);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setAllBlogPosts(parsed);
       // Default: All Categories + empty search, start at page 1
       refreshList(parsed, "", "", 1);
