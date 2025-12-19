@@ -23,7 +23,7 @@ export default function Blogs({ blogPosts, onDelete }: BlogListProps) {
               <button
                 aria-label="Delete blog"
                 onClick={() => onDelete(post.id)}
-                className="absolute top-3 right-3 inline-flex items-center justify-center w-9 h-9 rounded-full bg-red-600/90 text-white hover:bg-red-700 shadow focus:outline-none"
+                className="absolute top-3 right-3 inline-flex items-center justify-center w-9 h-9 rounded-full bg-red-600/90 text-white hover:bg-red-700 shadow focus:outline-none hover:cursor-pointer"
                 title="Delete"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-4 h-4">
@@ -42,9 +42,8 @@ export default function Blogs({ blogPosts, onDelete }: BlogListProps) {
               </span>
 
               <span
-                className={`px-3 py-1 text-xs sm:text-sm font-semibold rounded-full uppercase tracking-wide ${
-                  post.status === "Published" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
-                }`}
+                className={`px-3 py-1 text-xs sm:text-sm font-semibold rounded-full uppercase tracking-wide ${post.status === "Published" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
+                  }`}
               >
                 {post.status}
               </span>
