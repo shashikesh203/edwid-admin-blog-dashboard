@@ -14,6 +14,7 @@ export interface BlogPost {
   publishedDate: string;
   status: string;
   imageUrl?: string;
+  isDeleted?: boolean;
 }
 
 export default function Blogs() {
@@ -21,12 +22,15 @@ export default function Blogs() {
   const [allBlogPosts, setAllBlogPosts] = useState<BlogPost[]>([]);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
 
+  // Filters (default category = All)
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState(""); // "" means All Categories
 
+  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const PAGE_SIZE = 5;
+  const MAX_ITEMS = 12;
 
   const getFiltered = (
     source: BlogPost[] = allBlogPosts,
@@ -34,13 +38,15 @@ export default function Blogs() {
     categoryValue: string = selectedCategory
   ) => {
     const normalizedQuery = queryText.trim().toLowerCase();
-    return source.filter((post) => {
-      const matchesQuery = normalizedQuery
-        ? post.title.toLowerCase().includes(normalizedQuery)
-        : true;
-      const matchesCategory = categoryValue ? post.category === categoryValue : true;
-      return matchesQuery && matchesCategory;
-    });
+    return source
+      .filter((post) => !post.isDeleted)
+      .filter((post) => {
+        const matchesQuery = normalizedQuery
+          ? post.title.toLowerCase().includes(normalizedQuery)
+          : true;
+        const matchesCategory = categoryValue ? post.category === categoryValue : true;
+        return matchesQuery && matchesCategory;
+      });
   };
 
   const refreshList = (
@@ -66,12 +72,20 @@ export default function Blogs() {
   };
 
   const handleBlogDetails = (data: BlogPost) => {
-    const newBlog: BlogPost = { ...data, id: Date.now(), imageUrl: data.imageUrl };
-    const updated = [...allBlogPosts, newBlog];
+    const newBlog: BlogPost = { ...data, id: Date.now(), imageUrl: data.imageUrl, isDeleted: false };
+
+    // Insert new at the beginning so newest stays first
+    const updated: BlogPost[] = [newBlog, ...allBlogPosts];
+
+    // If more than 12 items, remove the last element
+    if (updated.length > MAX_ITEMS) {
+      updated.pop();
+    }
 
     setAllBlogPosts(updated);
     localStorage.setItem("blogDetails", JSON.stringify(updated));
 
+    // Reset to default filters (All category, empty search) and first page
     setSearchQuery("");
     setSelectedCategory("");
     refreshList(updated, "", "", 1);
@@ -83,9 +97,17 @@ export default function Blogs() {
   };
 
   const onCategoryChange: React.ChangeEventHandler<HTMLSelectElement> = (e) => {
-    const value = e.target.value;
+    const value = e.target.value; // "" => All Categories
     setSelectedCategory(value);
     refreshList(null, undefined, value, 1);
+  };
+
+  const handleSoftDelete = (id: number) => {
+    const updated = allBlogPosts.map((post) => (post.id === id ? { ...post, isDeleted: true } : post));
+    setAllBlogPosts(updated);
+    localStorage.setItem("blogDetails", JSON.stringify(updated));
+    // keep current filters but ensure pagination still valid
+    refreshList(updated);
   };
 
   useEffect(() => {
@@ -93,6 +115,7 @@ export default function Blogs() {
     if (data) {
       const parsed: BlogPost[] = JSON.parse(data);
       setAllBlogPosts(parsed);
+      // Default: All Categories + empty search, start at page 1
       refreshList(parsed, "", "", 1);
     }
   }, []);
@@ -127,12 +150,11 @@ export default function Blogs() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
           </svg>
           <span className="inlin ">Add New Blog</span>
-
         </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 px-4 sm:px-6 lg:px-8">
-        <Blog blogPosts={blogPosts} />
+        <Blog blogPosts={blogPosts} onDelete={handleSoftDelete} />
       </div>
 
       <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-30">
@@ -141,12 +163,11 @@ export default function Blogs() {
             aria-label="Previous page"
             onClick={() => refreshList(null, undefined, undefined, currentPage - 1)}
             disabled={currentPage <= 1}
-            className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-semibold transition-all
-        ${currentPage <= 1
+            className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-semibold transition-all ${
+              currentPage <= 1
                 ? "bg-gray-200 text-gray-400 cursor-not-allowed"
                 : "bg-blue-900 text-white hover:bg-blue-800 active:scale-95"
-              }
-      `}
+            }`}
           >
             ‹
           </button>
@@ -161,18 +182,16 @@ export default function Blogs() {
             aria-label="Next page"
             onClick={() => refreshList(null, undefined, undefined, currentPage + 1)}
             disabled={currentPage >= totalPages}
-            className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-semibold transition-all
-        ${currentPage >= totalPages
+            className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-semibold transition-all ${
+              currentPage >= totalPages
                 ? "bg-gray-200 text-gray-400 cursor-not-allowed"
                 : "bg-blue-900 text-white hover:bg-blue-800 active:scale-95"
-              }
-      `}
+            }`}
           >
             ›
           </button>
         </div>
       </div>
-
 
       <AddBlogModal
         handleBlogDetails={handleBlogDetails}
