@@ -7,7 +7,6 @@ import Category from "../../utils/enums/categoryEnum";
 import BlogStatus from "../../utils/enums/statusEnum";
 import type { BlogPost } from "../../pages/Blogs";
 
-
 interface AddBlogModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -22,7 +21,6 @@ interface BlogFormData {
   publishedDate: string;
   status: string;
   imageUrl?: string;
-
 }
 
 interface ErrorMessages {
@@ -53,7 +51,6 @@ export default function AddBlogModal({ handleBlogDetails, isOpen, onClose }: Add
     >
   ) => {
     const { name, value } = e.target;
-    console.log(name, value);
     setForm((prev) => {
       const updatedForm = { ...prev, [name]: value };
       validate(updatedForm, name, value);
@@ -77,8 +74,7 @@ export default function AddBlogModal({ handleBlogDetails, isOpen, onClose }: Add
       case "description":
         if (value.trim().length > 50) {
           setErrorsMessage((prev) => ({ ...prev, description: "Description must be at most 50 characters" }));
-        }
-        else {
+        } else {
           setErrorsMessage((prev) => ({ ...prev, description: "" }));
         }
         break;
@@ -117,12 +113,9 @@ export default function AddBlogModal({ handleBlogDetails, isOpen, onClose }: Add
           setErrorsMessage((prev) => ({ ...prev, category: "" }));
         }
         break;
-    
-  
       default:
         break;
     }
-
   };
 
   const validateForm = (formData: BlogFormData, image: File | null) => {
@@ -163,6 +156,13 @@ export default function AddBlogModal({ handleBlogDetails, isOpen, onClose }: Add
     return errors;
   };
 
+  const toDataUrl = (file: File) =>
+    new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -172,11 +172,14 @@ export default function AddBlogModal({ handleBlogDetails, isOpen, onClose }: Add
     if (Object.keys(validationErrors).length > 0) {
       return;
     }
-    const blogData = {
+
+    const imageUrl = image ? await toDataUrl(image) : undefined;
+
+    const blogData: BlogPost = {
       ...form,
       id: Date.now(),
-      imageUrl: image ? URL.createObjectURL(image) : undefined,
-    };
+      imageUrl,
+    } as BlogPost;
 
     handleBlogDetails?.(blogData);
     onClose();
@@ -192,7 +195,6 @@ export default function AddBlogModal({ handleBlogDetails, isOpen, onClose }: Add
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setErrorsMessage({});
     setForm({
       title: "",
@@ -204,7 +206,6 @@ export default function AddBlogModal({ handleBlogDetails, isOpen, onClose }: Add
     });
     setImage(null);
   }, [isOpen]);
-
 
   if (!isOpen) return null;
 
@@ -346,8 +347,6 @@ export default function AddBlogModal({ handleBlogDetails, isOpen, onClose }: Add
               )}
             </div>
           </div>
-
-
 
           <div className="mt-2 flex items-center justify-end gap-3">
             <button
