@@ -21,98 +21,114 @@ export default function Blogs() {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [allBlogPosts, setAllBlogPosts] = useState<BlogPost[]>([]);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const pageLimit = 5;
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [totalPages,setTotalPages] = useState<number>(0);
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
-  const PAGE_SIZE = 5;
-  const MAX_ITEMS = 12;
-
-  const getFiltered = (
-    source: BlogPost[] = allBlogPosts,
-    queryText: string = searchQuery,
-    categoryValue: string = selectedCategory
-  ) => {
-    const normalizedQuery = queryText.trim().toLowerCase();
-    return source
-      .filter((post) => !post.isDeleted)
-      .filter((post) => {
-        const matchesQuery = normalizedQuery
-          ? post.title.toLowerCase().includes(normalizedQuery)
-          : true;
-        const matchesCategory = categoryValue ? post.category === categoryValue : true;
-        return matchesQuery && matchesCategory;
-      });
+ const handleBlogDetails = (data: BlogPost) => {
+  const newBlog: BlogPost = {
+    ...data,
+    id: Date.now(),
+    imageUrl: data.imageUrl,
+    isDeleted: false,
   };
 
-  const refreshList = (
-    source: BlogPost[] | null = null,
-    nextQuery?: string,
-    nextCategory?: string,
-    nextPageOverride?: number
-  ) => {
-    const base = source ?? allBlogPosts;
-    const effectiveQuery = nextQuery !== undefined ? nextQuery : searchQuery;
-    const effectiveCategory = nextCategory !== undefined ? nextCategory : selectedCategory;
+  const updatedAllBlogs = [newBlog, ...allBlogPosts];
 
-    const filtered = getFiltered(base, effectiveQuery, effectiveCategory);
-    const total = filtered.length;
-    const maxPage = Math.max(1, Math.ceil(total / PAGE_SIZE));
-    const nextPage = Math.min(Math.max(nextPageOverride ?? currentPage, 1), maxPage);
+  setAllBlogPosts(updatedAllBlogs);
+  localStorage.setItem("blogDetails", JSON.stringify(updatedAllBlogs));
+  setCurrentPage(1);
+  setTotalPages(Math.ceil(updatedAllBlogs.length / pageLimit));
+  setBlogPosts(updatedAllBlogs.slice(0, pageLimit));
 
-    const start = (nextPage - 1) * PAGE_SIZE;
+  setSearchQuery("");
+  setSelectedCategory("");
+};
 
-    setTotalItems(total);
-    setCurrentPage(nextPage);
-    setBlogPosts(filtered.slice(start, start + PAGE_SIZE));
-  };
 
-  const handleBlogDetails = (data: BlogPost) => {
-    const newBlog: BlogPost = { ...data, id: Date.now(), imageUrl: data.imageUrl, isDeleted: false };
-
-    const updated: BlogPost[] = [newBlog, ...allBlogPosts];
-    if (updated.length > MAX_ITEMS) {
-      updated.pop();
-    }
-
-    setAllBlogPosts(updated);
-    localStorage.setItem("blogDetails", JSON.stringify(updated));
-    setSearchQuery("");
-    setSelectedCategory("");
-    refreshList(updated, "", "", 1);
-  };
-
+  
   const searchBlogPosts = (query: string) => {
     setSearchQuery(query);
-    refreshList(null, query, undefined, 1);
+    if (selectedCategory === "") {
+      setBlogPosts(allBlogPosts);
+      const queryInLowerCase = query.toLowerCase();
+      const searchedResult = allBlogPosts.filter((blog) =>
+        blog.title.toLowerCase().includes(queryInLowerCase) && blog.isDeleted === false
+      );
+      setCurrentPage(1)
+      setTotalPages(Math.ceil(searchedResult.length/ pageLimit))
+      setBlogPosts(searchedResult.slice(0, pageLimit*currentPage));
+    } else {
+      const categoryResult = allBlogPosts.filter(
+        (blog) => blog.category === selectedCategory
+      );
+      const queryInLowerCase = query.toLowerCase();
+      const searchedResult = categoryResult.filter((blog) =>
+        blog.title.toLowerCase().includes(queryInLowerCase) && blog.isDeleted === false
+      );
+      setCurrentPage(1)
+      setTotalPages(Math.ceil(searchedResult.length/ pageLimit))
+      setBlogPosts(searchedResult.slice( 0, pageLimit*currentPage));
+    }
   };
 
   const onCategoryChange: React.ChangeEventHandler<HTMLSelectElement> = (e) => {
     const value = e.target.value;
+    if (!value) {
+      const searchedResult = allBlogPosts.filter((blog) =>
+        blog.title.toLowerCase().includes(searchQuery.toLowerCase()) && blog.isDeleted === false
+      );
+      setCurrentPage(1)
+      setTotalPages(Math.ceil(searchedResult.length/ pageLimit))
+      setBlogPosts(searchedResult.slice(0, pageLimit*currentPage));
+      setSelectedCategory("");
+      return;
+    }
     setSelectedCategory(value);
-    refreshList(null, undefined, value, 1);
+    const searchedResult = allBlogPosts.filter((blog) =>
+      blog.title.toLowerCase().includes(searchQuery.toLowerCase()) && blog.isDeleted === false
+    );
+    const categoryResult = searchedResult.filter(
+      (blog) => blog.category === value
+    );
+    setCurrentPage(1)
+      setTotalPages(Math.ceil(categoryResult.length/ pageLimit))
+      setBlogPosts(categoryResult.slice( 0, pageLimit*currentPage));
   };
 
   const handleSoftDelete = (id: number) => {
-    const updated = allBlogPosts.map((post) => (post.id === id ? { ...post, isDeleted: true } : post));
-    setAllBlogPosts(updated);
-    localStorage.setItem("blogDetails", JSON.stringify(updated));
-    refreshList(updated);
-  };
+  const updatedAllBlogs = allBlogPosts.map((post) =>
+    post.id === id ? { ...post, isDeleted: true } : post
+  );
+
+  const activeBlogs = updatedAllBlogs.filter(
+    (post) => post.isDeleted !== true
+  );
+  setCurrentPage(1);
+  setTotalPages(Math.ceil(activeBlogs.length / pageLimit));
+
+  setAllBlogPosts(updatedAllBlogs);
+  setBlogPosts(activeBlogs.slice(0, pageLimit));
+  localStorage.setItem("blogDetails", JSON.stringify(updatedAllBlogs));
+};
+
 
   useEffect(() => {
     const data = localStorage.getItem("blogDetails");
     if (data) {
-      const parsed: BlogPost[] = JSON.parse(data);
+      console.log("CALLED")
+      const parsedData: BlogPost[] = JSON.parse(data);
+      const removedSoftData = parsedData.filter((blog) => blog.isDeleted === false)
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setAllBlogPosts(parsed);
-      refreshList(parsed, "", "", 1);
+      setAllBlogPosts(removedSoftData);
+      setTotalPages(Math.ceil(removedSoftData.length/pageLimit))
+      setBlogPosts(removedSoftData.slice((pageLimit * (currentPage -1)), pageLimit*currentPage));
+      
     }
-  }, []);
-
-  const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
+  }, [currentPage]);
 
   return (
     <div className="relative min-h-screen pb-8">
@@ -138,8 +154,18 @@ export default function Blogs() {
           onClick={() => setIsAddOpen(true)}
           className="w-full md:w-50 flex items-center  justify-center gap-2 px-3 sm:px-6 py-2.5 bg-blue-900 text-white rounded-lg hover:bg-blue-800 transition-colors font-medium shadow-sm hover:shadow-md hover:cursor-pointer flex-shrink-0"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M12 4v16m8-8H4"
+            />
           </svg>
           <span className="inlin ">Add New Blog</span>
         </button>
@@ -153,12 +179,16 @@ export default function Blogs() {
         <div className="flex items-center gap-2 rounded-xl bg-white/90 backdrop-blur border border-gray-200 shadow-lg px-3 py-2">
           <button
             aria-label="Previous page"
-            onClick={() => refreshList(null, undefined, undefined, currentPage - 1)}
+            onClick={()=>{
+              setCurrentPage(currentPage-1);
+              console.log(currentPage);
+            }}
             disabled={currentPage <= 1}
-            className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-semibold transition-all ${currentPage <= 1
+            className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-semibold transition-all ${
+              currentPage <= 1
                 ? "bg-gray-200 text-gray-400 cursor-not-allowed"
                 : "bg-blue-900 text-white hover:bg-blue-800 active:scale-95"
-              }`}
+            }`}
           >
             ‹
           </button>
@@ -171,12 +201,16 @@ export default function Blogs() {
 
           <button
             aria-label="Next page"
-            onClick={() => refreshList(null, undefined, undefined, currentPage + 1)}
+           onClick={()=>{
+              setCurrentPage(currentPage+1);
+              console.log(currentPage);
+            }}
             disabled={currentPage >= totalPages}
-            className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-semibold transition-all ${currentPage >= totalPages
+            className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-semibold transition-all ${
+              currentPage >= totalPages
                 ? "bg-gray-200 text-gray-400 cursor-not-allowed"
                 : "bg-blue-900 text-white hover:bg-blue-800 active:scale-95"
-              }`}
+            }`}
           >
             ›
           </button>
