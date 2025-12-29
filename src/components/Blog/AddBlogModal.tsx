@@ -195,6 +195,7 @@ export default function AddBlogModal({ handleBlogDetails, isOpen, onClose }: Add
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setErrorsMessage({});
     setForm({
       title: "",

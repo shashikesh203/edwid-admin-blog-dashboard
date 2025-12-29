@@ -39,10 +39,15 @@ export default function Blogs() {
   const updatedAllBlogs = [newBlog, ...allBlogPosts];
 
   setAllBlogPosts(updatedAllBlogs);
+
+  
   localStorage.setItem("blogDetails", JSON.stringify(updatedAllBlogs));
   setCurrentPage(1);
   setTotalPages(Math.ceil(updatedAllBlogs.length / pageLimit));
-  setBlogPosts(updatedAllBlogs.slice(0, pageLimit));
+   if(updatedAllBlogs.length==0){
+        setTotalPages(1);
+      }
+  setBlogPosts(updatedAllBlogs.slice((pageLimit * (currentPage -1)), pageLimit));
 
   setSearchQuery("");
   setSelectedCategory("");
@@ -60,7 +65,10 @@ export default function Blogs() {
       );
       setCurrentPage(1)
       setTotalPages(Math.ceil(searchedResult.length/ pageLimit))
-      setBlogPosts(searchedResult.slice(0, pageLimit*currentPage));
+       if(searchedResult.length==0){
+        setTotalPages(1);
+      }
+      setBlogPosts(searchedResult.slice((pageLimit * (currentPage -1)), pageLimit*currentPage));
     } else {
       const categoryResult = allBlogPosts.filter(
         (blog) => blog.category === selectedCategory
@@ -71,7 +79,10 @@ export default function Blogs() {
       );
       setCurrentPage(1)
       setTotalPages(Math.ceil(searchedResult.length/ pageLimit))
-      setBlogPosts(searchedResult.slice( 0, pageLimit*currentPage));
+       if(searchedResult.length==0){
+        setTotalPages(1);
+      }
+      setBlogPosts(searchedResult.slice( (pageLimit * (currentPage -1)), pageLimit*currentPage));
     }
   };
 
@@ -83,7 +94,10 @@ export default function Blogs() {
       );
       setCurrentPage(1)
       setTotalPages(Math.ceil(searchedResult.length/ pageLimit))
-      setBlogPosts(searchedResult.slice(0, pageLimit*currentPage));
+       if(searchedResult.length==0){
+        setTotalPages(1);
+      }
+      setBlogPosts(searchedResult.slice((pageLimit * (currentPage -1)), pageLimit*currentPage));
       setSelectedCategory("");
       return;
     }
@@ -96,7 +110,10 @@ export default function Blogs() {
     );
     setCurrentPage(1)
       setTotalPages(Math.ceil(categoryResult.length/ pageLimit))
-      setBlogPosts(categoryResult.slice( 0, pageLimit*currentPage));
+      if(categoryResult.length==0){
+        setTotalPages(1);
+      }
+      setBlogPosts(categoryResult.slice( (pageLimit * (currentPage -1)), pageLimit*currentPage));
   };
 
   const handleSoftDelete = (id: number) => {
@@ -109,22 +126,28 @@ export default function Blogs() {
   );
   setCurrentPage(1);
   setTotalPages(Math.ceil(activeBlogs.length / pageLimit));
-
+  if(activeBlogs.length==0){
+    setTotalPages(1);
+  }
   setAllBlogPosts(updatedAllBlogs);
-  setBlogPosts(activeBlogs.slice(0, pageLimit));
+  setBlogPosts(activeBlogs.slice((pageLimit * (currentPage -1)), pageLimit));
   localStorage.setItem("blogDetails", JSON.stringify(updatedAllBlogs));
+  
 };
 
 
   useEffect(() => {
     const data = localStorage.getItem("blogDetails");
     if (data) {
-      console.log("CALLED")
+    
       const parsedData: BlogPost[] = JSON.parse(data);
       const removedSoftData = parsedData.filter((blog) => blog.isDeleted === false)
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setAllBlogPosts(removedSoftData);
       setTotalPages(Math.ceil(removedSoftData.length/pageLimit))
+      if(removedSoftData.length==0){
+        setTotalPages(1);
+      }
       setBlogPosts(removedSoftData.slice((pageLimit * (currentPage -1)), pageLimit*currentPage));
       
     }
@@ -181,7 +204,7 @@ export default function Blogs() {
             aria-label="Previous page"
             onClick={()=>{
               setCurrentPage(currentPage-1);
-              console.log(currentPage);
+          
             }}
             disabled={currentPage <= 1}
             className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-semibold transition-all ${
@@ -203,7 +226,6 @@ export default function Blogs() {
             aria-label="Next page"
            onClick={()=>{
               setCurrentPage(currentPage+1);
-              console.log(currentPage);
             }}
             disabled={currentPage >= totalPages}
             className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-semibold transition-all ${
